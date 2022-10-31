@@ -18,7 +18,6 @@ def download_file(url):
         downloadurl = "https://" + downloadurl[1:]
     else:
         downloadurl = "https://sci-hub.se/d" + downloadurl
-    print("   mystr" + mystr)
     sys.stdout.flush()
     print("   downloadurl" + downloadurl)
     sys.stdout.flush()
