@@ -98,4 +98,4 @@ async def on_message(message):
         await message.channel.send("usage: `$sh urlofpaper`")
 
 if __name__ == '__main__':
-    bot.run(os.getenv('DISCORD_TOKEN'))
+    client.run(os.getenv('DISCORD_TOKEN'))
