@@ -73,6 +73,7 @@ async def on_message(message):
     if message.content.startswith('$sh '):
         print("recieved message: " + message.content)
         sys.stdout.flush()
+        await message.add_reaction("👍")
         url = url_conform(message.content[4:])
         try:
             contents = download_file(url)
