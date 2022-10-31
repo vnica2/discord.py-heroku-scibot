@@ -17,7 +17,7 @@ def download_file(url):
     if downloadurl[0] == "/":
         downloadurl = "https://" + downloadurl[1:]
     else:
-        downloadurl = "https://sci-hub.se/d" + downloadurl
+        downloadurl = "https://sci-hub.se/" + downloadurl
     sys.stdout.flush()
     print("   downloadurl" + downloadurl)
     sys.stdout.flush()
@@ -33,6 +33,7 @@ def download_file(url):
     sys.stdout.flush()
     #upload, then delete after done
 
+    #delete illegal filename characters
     filename = list(doi)
     for i in range(len(filename)):
         if filename[i] == "/":
@@ -45,6 +46,7 @@ def download_file(url):
     print("   $" + downloadurl + "$")
     sys.stdout.flush()
     return request.urlretrieve(downloadurl, filename)[0],doi
+
 #makes sure url has https:// in front
 def url_conform(url):
     con_url = url
@@ -83,7 +85,7 @@ async def on_message(message):
                 print("attempted to remove file" + filename)
                 sys.stdout.flush()
                 os.remove(filename)
-                print("current pwd contents: " + os.listdir())
+                print("current pwd contents: " + str(os.listdir()))
                 sys.stdout.flush()
             else:
                  print("tried to remove " + filename +" but not found")
