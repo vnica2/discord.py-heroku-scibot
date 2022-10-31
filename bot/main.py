@@ -82,4 +82,4 @@ async def on_message(message):
     if message.content.startswith('$help'):
         await message.channel.send("usage: `$sh urlofpaper`")
 
-client.run('MTAzNjQ0ODk2MjkzNDIzMTE0MQ.Gf_duX.nZ10GwDzIASaxAbrQ3zsSWrHauiZNsseTEO6uw')
+client.run('DISCORD_TOKEN')
