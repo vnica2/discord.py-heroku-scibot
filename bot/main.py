@@ -83,6 +83,8 @@ async def on_message(message):
                 print("attempted to remove file" + filename)
                 sys.stdout.flush()
                 os.remove(filename)
+                print("current pwd contents: " + os.listdir())
+                sys.stdout.flush()
             else:
                  print("tried to remove " + filename +" but not found")
                  sys.stdout.flush()
