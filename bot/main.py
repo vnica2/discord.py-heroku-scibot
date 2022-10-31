@@ -1,6 +1,9 @@
 from urllib import request
 import discord
 import os
+import sys
+print("    $   $  RUNNING")
+sys.stdout.flush()
 
 #queries sci-hub and then downloads pdf and names it its corresponding DOI
 def download_file(url):    
@@ -16,7 +19,9 @@ def download_file(url):
     else:
         downloadurl = "https://sci-hub.se/d" + downloadurl
     print("   mystr" + mystr)
+    sys.stdout.flush()
     print("   downloadurl" + downloadurl)
+    sys.stdout.flush()
 
     doi_index = mystr.index('<div id = "doi">') + 16
     doi = ""
@@ -26,6 +31,7 @@ def download_file(url):
         doi += i
     doi = doi.strip()
     print("  doi" + doi)
+    sys.stdout.flush()
     #upload, then delete after done
 
     filename = list(doi)
@@ -36,7 +42,9 @@ def download_file(url):
             filename[i] = ";"
     filename = ''.join([str(item) for item in filename]) + ".pdf"
     print("   $" + filename + "$")
+    sys.stdout.flush()
     print("   $" + downloadurl + "$")
+    sys.stdout.flush()
     return request.urlretrieve(downloadurl, filename)[0],doi
 #makes sure url has https:// in front
 def url_conform(url):
@@ -54,6 +62,7 @@ client = discord.Client(intents=intents)
 @client.event
 async def on_ready():
     print(f'We have logged in as {client.user}')
+    sys.stdout.flush()
 
 @client.event
 async def on_message(message):
@@ -62,6 +71,7 @@ async def on_message(message):
 
     if message.content.startswith('$sh '):
         print("recieved message: " + message.content)
+        sys.stdout.flush()
         url = url_conform(message.content[4:])
         try:
             contents = download_file(url)
@@ -69,17 +79,23 @@ async def on_message(message):
             with open(filename, 'rb') as fp:
                 await message.channel.send(file=discord.File(fp, contents[1] + ".pdf"))
                 print("sent file")
+                sys.stdout.flush()
             if os.path.exists(filename):
                 print("attempted to remove file" + filename)
+                sys.stdout.flush()
                 os.remove(filename)
             else:
                  print("tried to remove " + filename +" but not found")
+                 sys.stdout.flush()
         except Exception as e:
             print(e)
+            sys.stdout.flush()
             print("general error")
+            sys.stdout.flush()
             await message.channel.send("there was an error :(. malformed message or paper not found on sci-hub.se. if it is, dm the link to @buck#9576 so I can fix the bot :)")
 
     if message.content.startswith('$help'):
         await message.channel.send("usage: `$sh urlofpaper`")
 
-client.run('DISCORD_TOKEN')
+if __name__ == '__main__':
+    bot.run(os.getenv('DISCORD_TOKEN'))
