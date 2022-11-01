@@ -6,6 +6,7 @@ print("    $   $  RUNNING")
 sys.stdout.flush()
 
 #queries sci-hub and then downloads pdf and names it its corresponding DOI
+#returns the DOI 
 def download_file(url):    
     websiteurl = "https://sci-hub.se/" + url
     fp = request.urlopen(websiteurl)
@@ -31,7 +32,6 @@ def download_file(url):
     doi = doi.strip()
     print("  doi" + doi)
     sys.stdout.flush()
-    #upload, then delete after done
 
     #delete illegal filename characters
     filename = list(doi)
@@ -51,10 +51,15 @@ def download_file(url):
 def url_conform(url):
     con_url = url
     con_url = con_url.strip()
-    if con_url[:8] != "https://":
-        con_url = "https://" + con_url
+    if con_url[:7] != "http://":
+        if con_url[:8] == "https://":
+            return con_url
+        else:
+            if con_url.index("://") not <= 10:
+                con_url = "http://" + con_url
     return con_url
 
+#discord stuff
 intents = discord.Intents.default()
 intents.message_content = True
 
