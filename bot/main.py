@@ -2,18 +2,27 @@ from urllib import request
 import discord
 import os
 import sys
+import random
 print("    $   $  RUNNING")
 sys.stdout.flush()
 
-#queries sci-hub and then downloads pdf and names it its corresponding DOI
-#returns the DOI 
-def download_file(url):    
+ 
+def download_file(url):
+    '''queries sci-hub and then downloads pdf and names it its corresponding DOI
+    returns the DOI
+    inputs: url to download
+    output: tuple of: file object representing the pdf just downloaded from sci-hub, and its associated DOI
+    '''
+    #open sci-hub and try and get the whole page to later extract download link
+    user_agents = ["Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Mobile/15E148 Safari/604.1","Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/107.0.5304.66 Mobile/15E148 Safari/604.1","Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/106.0 Mobile/15E148 Safari/605.1.15"]
     websiteurl = "https://sci-hub.se/" + url
-    fp = request.urlopen(websiteurl)
+    req = request.Request(url=websiteurl, headers={'User-Agent' : user_agents[random.randrange(3)]})
+    fp = request.urlopen(req)
     mybytes = fp.read()
     mystr = mybytes.decode("utf8")
     fp.close()
 
+    #extract the url. the conditional is because sometimes it's self-hosted, sometimes it's not
     downloadurl = mystr[mystr.index("location.href=") + 16 :mystr.index("?download=true")+14]
     if downloadurl[0] == "/":
         downloadurl = "https://" + downloadurl[1:]
@@ -23,6 +32,7 @@ def download_file(url):
     print("   downloadurl" + downloadurl)
     sys.stdout.flush()
 
+    #get doi
     doi_index = mystr.index('<div id = "doi">') + 16
     doi = ""
     for i in mystr[doi_index:]:
@@ -40,24 +50,33 @@ def download_file(url):
             filename[i] = "-"
         if filename[i] == ":":
             filename[i] = ";"
+    #make filename not retarded
     filename = ''.join([str(item) for item in filename]) + ".pdf"
     print("   $" + filename + "$")
     sys.stdout.flush()
     print("   $" + downloadurl + "$")
     sys.stdout.flush()
+    #download and return
+    opener = request.build_opener()
+    opener.addheaders = [('User-Agent',user_agents[random.randrange(3)])]
+    request.install_opener(opener)
     return request.urlretrieve(downloadurl, filename)[0],doi
 
-#makes sure url has https:// in front
+
+#makes sure url has valid protocol in front
 def url_conform(url):
     con_url = url
     con_url = con_url.strip()
     if con_url[:7] != "http://":
         if con_url[:8] == "https://":
             return con_url
-        else:
-            if con_url.index("://") not <= 10:
+        elif not con_url.index("://") <= 10:
                 con_url = "http://" + con_url
     return con_url
+
+## ## ## ##
+## ## ## ##
+## ## ## ##
 
 #discord stuff
 intents = discord.Intents.default()
@@ -108,3 +127,5 @@ async def on_message(message):
 
 if __name__ == '__main__':
     client.run(os.getenv('DISCORD_TOKEN'))
+        
+
