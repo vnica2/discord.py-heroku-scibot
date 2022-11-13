@@ -1,12 +1,24 @@
 from urllib import request
+import urllib.parse
 import discord
 import os
 import sys
 import random
 print("    $   $  RUNNING")
 sys.stdout.flush()
+USER_AGENTS = ["Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Mobile/15E148 Safari/604.1","Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/107.0.5304.66 Mobile/15E148 Safari/604.1","Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/106.0 Mobile/15E148 Safari/605.1.15"]
 
- 
+def download_and_decode_html(url):
+    websiteurl = "https://sci-hub.se/" + url
+    req = request.Request(url=websiteurl, headers={'User-Agent' : USER_AGENTS[random.randrange(3)]})
+    fp = request.urlopen(req)
+    mybytes = fp.read()
+    mystr = mybytes.decode("utf8")
+    fp.close()
+    print("decoded...")
+    sys.stdout.flush()
+    return mystr
+
 def download_file(url):
     '''queries sci-hub and then downloads pdf and names it its corresponding DOI
     returns the DOI
@@ -14,16 +26,26 @@ def download_file(url):
     output: tuple of: file object representing the pdf just downloaded from sci-hub, and its associated DOI
     '''
     #open sci-hub and try and get the whole page to later extract download link
-    user_agents = ["Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Mobile/15E148 Safari/604.1","Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/107.0.5304.66 Mobile/15E148 Safari/604.1","Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/106.0 Mobile/15E148 Safari/605.1.15"]
-    websiteurl = "https://sci-hub.se/" + url
-    req = request.Request(url=websiteurl, headers={'User-Agent' : user_agents[random.randrange(3)]})
-    fp = request.urlopen(req)
-    mybytes = fp.read()
-    mystr = mybytes.decode("utf8")
-    fp.close()
-
+    mystr = download_and_decode_html(url)
     #extract the url. the conditional is because sometimes it's self-hosted, sometimes it's not
-    downloadurl = mystr[mystr.index("location.href=") + 16 :mystr.index("?download=true")+14]
+    #the try block is incase there is %2F
+    try:
+        print("block1")
+        downloadurl = mystr[mystr.index("location.href=") + 16 :mystr.index("?download=true")+14]
+        
+    except:
+        try:
+            print("block2")
+            url = urllib.parse.unquote(url)
+            print(url)
+            mystr = download_and_decode_html(url)
+            downloadurl = mystr[mystr.index("location.href=") + 16 :mystr.index("?download=true")+14]
+        except:
+            print("block3")
+            url = url.replace("%2F","/")
+            url = url.replace("%2f","/")
+            mystr = download_and_decode_html(url)
+            downloadurl = mystr[mystr.index("location.href=") + 16 :mystr.index("?download=true")+14]
     if downloadurl[0] == "/":
         downloadurl = "https://" + downloadurl[1:]
     else:
@@ -58,9 +80,10 @@ def download_file(url):
     sys.stdout.flush()
     #download and return
     opener = request.build_opener()
-    opener.addheaders = [('User-Agent',user_agents[random.randrange(3)])]
+    opener.addheaders = [('User-Agent',USER_AGENTS[random.randrange(3)])]
     request.install_opener(opener)
     return request.urlretrieve(downloadurl, filename)[0],doi
+
 
 
 #makes sure url has valid protocol in front
@@ -124,7 +147,7 @@ async def on_message(message):
 
     if message.content.startswith('$help'):
         await message.channel.send("usage: `$sh urlofpaper`")
-
+      
 if __name__ == '__main__':
     client.run(os.getenv('DISCORD_TOKEN'))
         
