@@ -93,8 +93,15 @@ def url_conform(url):
     if con_url[:7] != "http://":
         if con_url[:8] == "https://":
             return con_url
-        elif not con_url.index("://") <= 10:
-                con_url = "http://" + con_url
+        colindex = 11
+        try:
+            #this makes sure it doesn't overwrite some other protocol. if :// appears before 10, it's likely just some weird protocol. if not, assume and hope it's http
+            colindex = con_url.index("://")
+        except: 
+            print(":// not found. assuming http://")
+            sys.stdout.flush()
+        if colindex > 10:
+            con_url = "http://" + con_url
     return con_url
 
 ## ## ## ##
