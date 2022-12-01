@@ -162,8 +162,8 @@ async def on_message(message):
             sys.stdout.flush()
             print("general error")
             sys.stdout.flush()
-            await message.channel.send("error;; paper might not be found on sci-hub.se. if it is, dm the link to @buck#9576 and i will try to fix bot")
-            await message.channel.send('''either put the url of the paper like so:`$sh urlofpaper`
+            await message.channel.send('''error;; paper might not be found on sci-hub.se. if it is, dm the link to @buck#9576 and i will try to fix bot
+either put the url of the paper like so:`$sh urlofpaper`
 OR put the doi like so: `$sh 10.xxxx/blahblah`''')
 
     if message.content.startswith('$help'):
