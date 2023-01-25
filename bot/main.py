@@ -1,5 +1,6 @@
-from urllib import request
-import urllib.parse
+from stem import Signal
+from stem.control import Controller
+import requests
 import discord
 import os
 import sys
@@ -8,20 +9,42 @@ print("    $   $  RUNNING")
 sys.stdout.flush()
 USER_AGENTS = ["Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Mobile/15E148 Safari/604.1","Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/107.0.5304.66 Mobile/15E148 Safari/604.1","Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/106.0 Mobile/15E148 Safari/605.1.15","Mozilla/5.0 (iPad; CPU OS 15_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148","Mozilla/5.0 (iPad; CPU OS 15_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"    ,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36","Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"]
 selection = 0
+
+#tor stuff
+def get_tor_session():
+    session = requests.session()
+    # Tor uses the 9050 port as the default socks port
+    session.proxies = {'http':  'socks5://127.0.0.1:9050',
+                       'https': 'socks5://127.0.0.1:9050'}
+    return session
+
+def renew_connection():
+    with Controller.from_port(port = 9051) as controller:
+        controller.authenticate(password="password")
+        controller.signal(Signal.NEWNYM)
+    return get_tor_session()
+
+# Make a request through the Tor connection
+# IP visible through Tor
+session = get_tor_session()
+print(session.get("http://httpbin.org/ip").text)
+# Above should print an IP different than your public IP
+
+# Following prints your normal public IP
+print(requests.get("http://httpbin.org/ip").text)
+
+
 def download_and_decode_html(url):
-    websiteurl = "https://sci-hub.se/" + url
+    websiteurl = "https://sci-hub.hkvisa.net/" + url
     global selection
     print("[1] selection was... ", selection)
     selection = (selection + 1) % len(USER_AGENTS)
     print(" selection is now... ", selection)
-    req = request.Request(url=websiteurl, headers={'User-Agent' : USER_AGENTS[selection]})
-    fp = request.urlopen(req)
-    mybytes = fp.read()
-    mystr = mybytes.decode("utf8")
-    fp.close()
-    print("decoded...")
-    sys.stdout.flush()
-    return mystr
+    fp = renew_connection().get(websiteurl,headers={'User-Agent' : USER_AGENTS[selection]})
+    htmlstr = fp.text.replace('\\','')
+    print(htmlstr)
+    print("string downloaded")
+    return htmlstr
 
 def download_file(url):
     '''queries sci-hub and then downloads pdf and names it its corresponding DOI
@@ -35,8 +58,8 @@ def download_file(url):
     #the try block is incase there is %2F
     try:
         print("block1")
-        downloadurl = mystr[mystr.index("location.href=") + 16 :mystr.index("?download=true")+14]
-        
+        downloadurl = mystr[mystr.index("location.href=") + 15 :mystr.index("?download=true")+14]
+        print(downloadurl + "og")
     except:
         try:
             print("block2")
@@ -51,15 +74,16 @@ def download_file(url):
             mystr = download_and_decode_html(url)
             downloadurl = mystr[mystr.index("location.href=") + 16 :mystr.index("?download=true")+14]
     if downloadurl[0] == "/":
-        downloadurl = "https://" + downloadurl[1:]
-    else:
-        downloadurl = "https://sci-hub.se/" + downloadurl
+        if downloadurl[1] == "/":
+            downloadurl = "https:/" + downloadurl[1:]
+        else:
+            downloadurl = "https://" + downloadurl[1:]
     sys.stdout.flush()
-    print("   downloadurl: " + downloadurl)
+    print("   downloadurl modified: " + downloadurl)
     sys.stdout.flush()
 
     #get doi
-    doi_index = mystr.index('<div id = "doi">') + 16
+    doi_index = mystr.index('</i> doi:') + 9
     doi = ""
     for i in mystr[doi_index:]:
         if i == "<":
@@ -83,14 +107,15 @@ def download_file(url):
     print("   $" + downloadurl + "$")
     sys.stdout.flush()
     #download and return
-    opener = request.build_opener()
+
     global selection
     print("[1] selection was... ", selection)
     selection = (selection + 1) % len(USER_AGENTS)
     print(" selection is now... ", selection)
-    opener.addheaders = [('User-Agent',USER_AGENTS[selection])]
-    request.install_opener(opener)
-    return request.urlretrieve(downloadurl, filename)[0],doi
+    [('User-Agent',USER_AGENTS[selection])]
+    pdf = renew_connection().get(downloadurl,headers={'User-Agent' : USER_AGENTS[selection]})
+    open(filename, 'wb').write(pdf.content)
+    return filename,doi
 
 
 
@@ -162,7 +187,7 @@ async def on_message(message):
             sys.stdout.flush()
             print("general error")
             sys.stdout.flush()
-            await message.channel.send('''error;; paper might not be found on sci-hub.se. if it is, dm the link to @buck#9576 and i will try to fix bot
+            await message.channel.send('''error;; paper might not be found on sci-hub.hkvisa.net. if it is, dm the link to @buck#9576 and i will try to fix bot
 either put the url of the paper like so:`$sh urlofpaper`
 OR put the doi like so: `$sh 10.xxxx/blahblah`''')
 
@@ -172,6 +197,4 @@ OR put the doi like so: `$sh 10.xxxx/blahblah`''')
 if __name__ == '__main__':
     client.run(os.getenv('DISCORD_TOKEN'))
 
-
-        
 
