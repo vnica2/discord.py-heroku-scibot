@@ -1,3 +1,4 @@
 discord.py==2.0.1
 stem==1.8.1 
 requests==2.28.2 
+requests[socks]>=2.10.0
