@@ -42,7 +42,7 @@ def download_and_decode_html(url):
     print(" selection is now... ", selection)
     fp = get_tor_session().get(websiteurl,headers={'User-Agent' : USER_AGENTS[selection]})
     htmlstr = fp.text.replace('\\','')
-    print(htmlstr)
+    #print(htmlstr)
     print("string downloaded")
     return htmlstr
 
