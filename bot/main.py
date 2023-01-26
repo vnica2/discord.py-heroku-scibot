@@ -20,7 +20,7 @@ def get_tor_session():
 
 def renew_connection():
     with Controller.from_port(port = 9051) as controller:
-        controller.authenticate(password="password")
+        controller.authenticate(password=os.getenv('PLAINTEXT_PASSWORD')))
         controller.signal(Signal.NEWNYM)
     return get_tor_session()
 
