@@ -40,7 +40,7 @@ def download_and_decode_html(url):
     print("[1] selection was... ", selection)
     selection = (selection + 1) % len(USER_AGENTS)
     print(" selection is now... ", selection)
-    fp = renew_connection().get(websiteurl,headers={'User-Agent' : USER_AGENTS[selection]})
+    fp = get_tor_session().get(websiteurl,headers={'User-Agent' : USER_AGENTS[selection]})
     htmlstr = fp.text.replace('\\','')
     print(htmlstr)
     print("string downloaded")
@@ -66,13 +66,13 @@ def download_file(url):
             url = urllib.parse.unquote(url)
             print(url)
             mystr = download_and_decode_html(url)
-            downloadurl = mystr[mystr.index("location.href=") + 16 :mystr.index("?download=true")+14]
+            downloadurl = mystr[mystr.index("location.href=") + 15 :mystr.index("?download=true")+14]
         except:
             print("block3")
             url = url.replace("%2F","/")
             url = url.replace("%2f","/")
             mystr = download_and_decode_html(url)
-            downloadurl = mystr[mystr.index("location.href=") + 16 :mystr.index("?download=true")+14]
+            downloadurl = mystr[mystr.index("location.href=") + 15 :mystr.index("?download=true")+14]
     if downloadurl[0] == "/":
         if downloadurl[1] == "/":
             downloadurl = "https:/" + downloadurl[1:]
