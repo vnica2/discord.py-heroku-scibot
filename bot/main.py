@@ -102,7 +102,7 @@ def download_file(url):
             filename[i] = ";"
     #make filename not retarded
     filename = ''.join([str(item) for item in filename]) + ".pdf"
-    filename = filename.replace("&nbsp","")
+    filename = filename.replace("&nbsp;","")
     print("   $" + filename + "$")
     sys.stdout.flush()
     print("   $" + downloadurl + "$")
