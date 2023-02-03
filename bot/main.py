@@ -103,7 +103,7 @@ def download_file(url):
     #make filename not retarded
     filename = ''.join([str(item) for item in filename]) + ".pdf"
     filename = filename.replace("&nbsp;","")
-    print("   $" + filename + "$")
+    print("   $" + repr(filename) + "$")
     sys.stdout.flush()
     print("   $" + downloadurl + "$")
     sys.stdout.flush()
@@ -117,7 +117,7 @@ def download_file(url):
     pdf = renew_connection().get(downloadurl,headers={'User-Agent' : USER_AGENTS[selection]})
     open(filename, 'wb').write(pdf.content)
     #debug
-    print("current pwd contents: " + str(os.listdir()))
+    print("current pwd contents: " + repr(os.listdir()))
     sys.stdout.flush()
     return filename,doi
 
