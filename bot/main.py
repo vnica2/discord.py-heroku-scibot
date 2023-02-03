@@ -174,7 +174,7 @@ async def on_message(message):
             contents = download_file(url)
             filename = contents[0]
             with open(filename, 'rb') as fp:
-                await message.channel.send(file=discord.File(fp, contents[1] + ".pdf"))
+                await message.channel.send(file=discord.File(fp, filename)
                 print("sent file")
                 sys.stdout.flush()
             if os.path.exists(filename):
