@@ -107,11 +107,8 @@ def download_file(url):
     sys.stdout.flush()
     print("   $" + downloadurl + "$")
     sys.stdout.flush()
-    #debug
-    print("current pwd contents: " + str(os.listdir()))
-    sys.stdout.flush()
-    #download and return
 
+    #download and return
     global selection
     print("[1] selection was... ", selection)
     selection = (selection + 1) % len(USER_AGENTS)
@@ -119,6 +116,9 @@ def download_file(url):
     [('User-Agent',USER_AGENTS[selection])]
     pdf = renew_connection().get(downloadurl,headers={'User-Agent' : USER_AGENTS[selection]})
     open(filename, 'wb').write(pdf.content)
+    #debug
+    print("current pwd contents: " + str(os.listdir()))
+    sys.stdout.flush()
     return filename,doi
 
 
