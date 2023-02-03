@@ -107,6 +107,9 @@ def download_file(url):
     sys.stdout.flush()
     print("   $" + downloadurl + "$")
     sys.stdout.flush()
+    #debug
+    print("current pwd contents: " + str(os.listdir()))
+    sys.stdout.flush()
     #download and return
 
     global selection
