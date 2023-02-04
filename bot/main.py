@@ -75,9 +75,9 @@ def download_file(url):
             downloadurl = mystr[mystr.index("location.href=") + 15 :mystr.index("?download=true")+14]
     if downloadurl[0] == "/":
         if downloadurl[1] == "/":
-            downloadurl = "https:/" + downloadurl[1:]
+            downloadurl = "https://" + downloadurl[2:]
         else:
-            downloadurl = "https://" + downloadurl[1:]
+            downloadurl = "https://sci-hub.se/" + downloadurl[1:]
     sys.stdout.flush()
     print("   downloadurl modified: " + downloadurl)
     sys.stdout.flush()
