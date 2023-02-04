@@ -35,7 +35,7 @@ print(requests.get("http://httpbin.org/ip").text)
 
 
 def download_and_decode_html(url):
-    websiteurl = "https://sci-hub.hkvisa.net/" + url
+    websiteurl = "https://sci-hub.st/" + url
     global selection
     print("[1] selection was... ", selection)
     selection = (selection + 1) % len(USER_AGENTS)
