@@ -85,10 +85,16 @@ def download_file(url):
     #get doi
     doi = ""
     if '</i> doi:' in mystr:
+        print("doi 1")
+        sys.stdout.flush()
         doi_index = mystr.index('</i> doi:') + 9
     elif '<div id = "doi">' in mystr:
-        doi_index = mystr.index('</i> doi:') + 16
+        print("doi 2")
+        sys.stdout.flush()
+        doi_index = mystr.index('<div id = "doi">') + 16
     else:
+        print("doi not found")
+        sys.stdout.flush()
         doi = 'unknown'
     if doi != 'unknown':
         for i in mystr[doi_index:]:
