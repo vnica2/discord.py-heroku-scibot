@@ -83,8 +83,14 @@ def download_file(url):
     sys.stdout.flush()
 
     #get doi
-    doi_index = mystr.index('</i> doi:') + 9
     doi = ""
+    if '</i> doi:' in mystr:
+        doi_index = mystr.index('</i> doi:') + 9
+    elif '<div id = "doi">' in mystr:
+        doi_index = mystr.index('</i> doi:') + 16
+    else:
+        doi = 'unknown'
+        break
     for i in mystr[doi_index:]:
         if i == "<":
             break
