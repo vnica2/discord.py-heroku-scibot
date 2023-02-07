@@ -90,11 +90,11 @@ def download_file(url):
         doi_index = mystr.index('</i> doi:') + 16
     else:
         doi = 'unknown'
-        break
-    for i in mystr[doi_index:]:
-        if i == "<":
-            break
-        doi += i
+    if doi != 'unknown':
+        for i in mystr[doi_index:]:
+            if i == "<":
+                break
+            doi += i
     doi = doi.strip()
     print("  doi: " + doi)
     sys.stdout.flush()
