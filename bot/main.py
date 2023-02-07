@@ -84,7 +84,12 @@ def download_file(url):
 
     #get doi
     doi = ""
-    if '</i> doi:' in mystr:
+    if 'doi:10' in mystr:
+        print("doi 0")
+        sys.stdout.flush()
+        doi_index = mystr.index('doi:10') + 4
+    #fallbacks, with the else condition setting it to "unknown" to avoid catostrophic error
+    elif '</i> doi:' in mystr:
         print("doi 1")
         sys.stdout.flush()
         doi_index = mystr.index('</i> doi:') + 9
