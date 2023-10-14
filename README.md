@@ -1,4 +1,4 @@
-#Discord sci-hub bot
+# Discord sci-hub bot
 
 Lets users of your server download papers from sci-hub.
 After adding the bot, send "$sh paperlink_or_DOI" and the bot will attempt to grab and upload the paper from sci-hub's servers.
