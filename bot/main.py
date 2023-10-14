@@ -117,7 +117,7 @@ def download_file(url):
             filename[i] = "-"
         if filename[i] == ":":
             filename[i] = ";"
-    #make filename not retarded
+    #make filename not goofy
     filename = ''.join([str(item) for item in filename]) + ".pdf"
     filename = filename.replace("&nbsp;","")
     print("   $" + repr(filename) + "$")
